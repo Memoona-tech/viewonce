@@ -62,7 +62,7 @@ export default function SharePage({ params }: { params: { token: string } }) {
     };
   }, []);
 
-  // 2) auto‑destroy after 15s
+  // auto‑destroy after 15s
   useEffect(() => {
     if (status !== "ready") return;
     timerRef.current = window.setTimeout(() => {
@@ -76,17 +76,17 @@ export default function SharePage({ params }: { params: { token: string } }) {
   }, [status]);
 
   if (status === "loading") {
-    return <p className="p-8 text-center">Loading...</p>;
+    return <p className="p-8 text-center font-bold text-pink-500">Loading... 🥳</p>;
   }
   if (status === "expired") {
-    return <p className="p-8 text-center">This link is expired.</p>;
+    return <p className="p-8 text-center font-bold text-red-600">This link is expired.</p>;
   }
 
   return (
     <div className="relative flex items-center justify-center min-h-screen bg-black">
       <CanvasPreview src={publicUrl} />
 
-      {/* My Watermark 😬 */}
+      {/* Oh the Watermark 😬 */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <span className="text-white text-2xl opacity-30">
           Shared by @skycarly

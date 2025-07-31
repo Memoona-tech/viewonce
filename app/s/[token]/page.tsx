@@ -1,22 +1,14 @@
-// app/s/[token]/page.tsx
-"use client";
-
-import { useEffect, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { useEffect, useRef, useState } from "react";
 import CanvasPreview from "@/app/components/canvas";
-
-interface Props {
-  params: {
-    token: string;
-  };
-}
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function SharePage({ params }: Props) {
+// ✅ ✅ ✅ DO NOT type the params manually anymore
+export default function SharePage({ params }: { params: { token: string } }) {
   const [publicUrl, setPublicUrl] = useState<string>("");
   const [status, setStatus] = useState<"loading" | "ready" | "expired">(
     "loading"
@@ -36,13 +28,11 @@ export default function SharePage({ params }: Props) {
         return;
       }
 
-      // Mark used
       await supabase
         .from("share_tokens")
         .update({ used: true })
         .eq("token", params.token);
 
-      // Get public URL
       const { data: urlData } = supabase.storage
         .from("photos")
         .getPublicUrl(data.path);
@@ -54,7 +44,6 @@ export default function SharePage({ params }: Props) {
     fetchAndMark();
   }, [params.token]);
 
-  // for screen recording, inspect, right-click, etc.
   useEffect(() => {
     const blockContext = (e: MouseEvent) => e.preventDefault();
     const blockKeys = (e: KeyboardEvent) => {
@@ -66,6 +55,7 @@ export default function SharePage({ params }: Props) {
     };
     document.addEventListener("contextmenu", blockContext);
     document.addEventListener("keydown", blockKeys);
+
     return () => {
       document.removeEventListener("contextmenu", blockContext);
       document.removeEventListener("keydown", blockKeys);
@@ -89,6 +79,7 @@ export default function SharePage({ params }: Props) {
       <p className="p-8 text-center font-bold text-pink-500">Loading... 🥳</p>
     );
   }
+
   if (status === "expired") {
     return (
       <p className="p-8 text-center font-bold text-red-600">

@@ -1,24 +1,26 @@
+// app/s/[token]/page.tsx
 "use client";
+
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import CanvasPreview from "@/app/components/canvas";
 
-// Supabase setup
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-// ✅ Proper type for app router page params
-interface PageProps {
+interface Props {
   params: {
     token: string;
   };
 }
 
-export default function SharePage({ params }: PageProps) {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export default function SharePage({ params }: Props) {
   const [publicUrl, setPublicUrl] = useState<string>("");
-  const [status, setStatus] = useState<"loading" | "ready" | "expired">("loading");
+  const [status, setStatus] = useState<"loading" | "ready" | "expired">(
+    "loading"
+  );
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -34,13 +36,13 @@ export default function SharePage({ params }: PageProps) {
         return;
       }
 
-      // mark used
+      // Mark used
       await supabase
         .from("share_tokens")
         .update({ used: true })
         .eq("token", params.token);
 
-      // get public URL
+      // Get public URL
       const { data: urlData } = supabase.storage
         .from("photos")
         .getPublicUrl(data.path);
@@ -52,6 +54,7 @@ export default function SharePage({ params }: PageProps) {
     fetchAndMark();
   }, [params.token]);
 
+  // for screen recording, inspect, right-click, etc.
   useEffect(() => {
     const blockContext = (e: MouseEvent) => e.preventDefault();
     const blockKeys = (e: KeyboardEvent) => {
@@ -97,8 +100,6 @@ export default function SharePage({ params }: PageProps) {
   return (
     <div className="relative flex items-center justify-center min-h-screen bg-black">
       <CanvasPreview src={publicUrl} />
-
-      {/* Oh the Watermark 😬 */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <span className="text-white text-2xl opacity-50 font-bold">
           Shared by @skycarly

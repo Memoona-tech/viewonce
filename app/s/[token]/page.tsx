@@ -3,16 +3,22 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import CanvasPreview from "@/app/components/canvas";
 
+// Supabase setup
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function SharePage({ params }: { params: { token: string } }) {
+// ✅ Proper type for app router page params
+interface PageProps {
+  params: {
+    token: string;
+  };
+}
+
+export default function SharePage({ params }: PageProps) {
   const [publicUrl, setPublicUrl] = useState<string>("");
-  const [status, setStatus] = useState<"loading" | "ready" | "expired">(
-    "loading"
-  );
+  const [status, setStatus] = useState<"loading" | "ready" | "expired">("loading");
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -46,7 +52,6 @@ export default function SharePage({ params }: { params: { token: string } }) {
     fetchAndMark();
   }, [params.token]);
 
-  // disable right-click & certain keys
   useEffect(() => {
     const blockContext = (e: MouseEvent) => e.preventDefault();
     const blockKeys = (e: KeyboardEvent) => {
@@ -58,14 +63,12 @@ export default function SharePage({ params }: { params: { token: string } }) {
     };
     document.addEventListener("contextmenu", blockContext);
     document.addEventListener("keydown", blockKeys);
-
     return () => {
       document.removeEventListener("contextmenu", blockContext);
       document.removeEventListener("keydown", blockKeys);
     };
   }, []);
 
-  // auto‑destroy after 15s
   useEffect(() => {
     if (status !== "ready") return;
     timerRef.current = window.setTimeout(() => {

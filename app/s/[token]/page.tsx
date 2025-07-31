@@ -10,12 +10,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// Next.js App Router will infer params for you
-export default async function SharePage({
-  params,
-}: {
-  params: { token: string };
-}) {
+export default async function SharePage({ params }) {
   // 1 Fetch and validate token
   const { data } = await supabase
     .from("share_tokens")

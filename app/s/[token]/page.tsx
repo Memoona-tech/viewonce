@@ -1,3 +1,5 @@
+"use client";
+
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useRef, useState } from "react";
 import CanvasPreview from "@/app/components/canvas";
@@ -7,7 +9,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// ✅ ✅ ✅ DO NOT type the params manually anymore
 export default function SharePage({ params }: { params: { token: string } }) {
   const [publicUrl, setPublicUrl] = useState<string>("");
   const [status, setStatus] = useState<"loading" | "ready" | "expired">(

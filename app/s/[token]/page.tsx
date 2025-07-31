@@ -4,16 +4,19 @@ import { createClient } from "@supabase/supabase-js";
 import { useEffect, useRef, useState } from "react";
 import CanvasPreview from "@/app/components/canvas";
 
+// ✅ Correctly typed page props (NEXT 13+)
+interface SharePageProps {
+  params: { token: string };
+}
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function SharePage({ params }: { params: { token: string } }) {
+export default function SharePage({ params }: SharePageProps) {
   const [publicUrl, setPublicUrl] = useState<string>("");
-  const [status, setStatus] = useState<"loading" | "ready" | "expired">(
-    "loading"
-  );
+  const [status, setStatus] = useState<"loading" | "ready" | "expired">("loading");
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -51,12 +54,12 @@ export default function SharePage({ params }: { params: { token: string } }) {
       if (
         e.key === "PrintScreen" ||
         (e.ctrlKey && ["s", "p", "u"].includes(e.key.toLowerCase()))
-      )
+      ) {
         e.preventDefault();
+      }
     };
     document.addEventListener("contextmenu", blockContext);
     document.addEventListener("keydown", blockKeys);
-
     return () => {
       document.removeEventListener("contextmenu", blockContext);
       document.removeEventListener("keydown", blockKeys);

@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import CanvasPreview from "@/app/components/canvas";
@@ -10,7 +10,9 @@ const supabase = createClient(
 
 export default function SharePage({ params }: { params: { token: string } }) {
   const [publicUrl, setPublicUrl] = useState<string>("");
-  const [status, setStatus] = useState<"loading"|"ready"|"expired">("loading");
+  const [status, setStatus] = useState<"loading" | "ready" | "expired">(
+    "loading"
+  );
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -27,13 +29,13 @@ export default function SharePage({ params }: { params: { token: string } }) {
       }
 
       // mark used
-      await supabase.from("share_tokens")
+      await supabase
+        .from("share_tokens")
         .update({ used: true })
         .eq("token", params.token);
 
       // get public URL
-      const { data: urlData } = supabase
-        .storage
+      const { data: urlData } = supabase.storage
         .from("photos")
         .getPublicUrl(data.path);
 
@@ -50,8 +52,9 @@ export default function SharePage({ params }: { params: { token: string } }) {
     const blockKeys = (e: KeyboardEvent) => {
       if (
         e.key === "PrintScreen" ||
-        (e.ctrlKey && ["s","p","u"].includes(e.key.toLowerCase()))
-      ) e.preventDefault();
+        (e.ctrlKey && ["s", "p", "u"].includes(e.key.toLowerCase()))
+      )
+        e.preventDefault();
     };
     document.addEventListener("contextmenu", blockContext);
     document.addEventListener("keydown", blockKeys);
@@ -76,10 +79,16 @@ export default function SharePage({ params }: { params: { token: string } }) {
   }, [status]);
 
   if (status === "loading") {
-    return <p className="p-8 text-center font-bold text-pink-500">Loading... 🥳</p>;
+    return (
+      <p className="p-8 text-center font-bold text-pink-500">Loading... 🥳</p>
+    );
   }
   if (status === "expired") {
-    return <p className="p-8 text-center font-bold text-red-600">This link is expired.</p>;
+    return (
+      <p className="p-8 text-center font-bold text-red-600">
+        Photo already viewed! 🤧
+      </p>
+    );
   }
 
   return (
@@ -88,7 +97,7 @@ export default function SharePage({ params }: { params: { token: string } }) {
 
       {/* Oh the Watermark 😬 */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <span className="text-white text-2xl opacity-30">
+        <span className="text-white text-2xl opacity-50 font-bold">
           Shared by @skycarly
         </span>
       </div>

@@ -4,17 +4,16 @@ import { createClient } from "@supabase/supabase-js";
 import { useEffect, useRef, useState } from "react";
 import CanvasPreview from "@/app/components/canvas";
 
-// ✅ Correctly typed page props (NEXT 13+)
-interface SharePageProps {
-  params: { token: string };
-}
+type Props = {
+  params: Record<string, string>;
+};
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function SharePage({ params }: SharePageProps) {
+export default function SharePage({ params }: Props) {
   const [publicUrl, setPublicUrl] = useState<string>("");
   const [status, setStatus] = useState<"loading" | "ready" | "expired">("loading");
   const timerRef = useRef<number | null>(null);

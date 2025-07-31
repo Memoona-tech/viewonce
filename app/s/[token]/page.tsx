@@ -1,5 +1,3 @@
-// app/s/[token]/page.tsx
-
 import { createClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import CanvasPreview from "@/app/components/canvas";
@@ -10,7 +8,11 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default async function SharePage({ params }) {
+export default async function SharePage({
+  params,
+}: {
+  params: { token: string };
+}) {
   // 1 Fetch and validate token
   const { data } = await supabase
     .from("share_tokens")

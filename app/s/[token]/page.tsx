@@ -1,3 +1,5 @@
+// app/s/[token]/page.tsx
+
 import { createClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import CanvasPreview from "@/app/components/canvas";
@@ -8,37 +10,37 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-interface SharePageProps {
+// Next.js App Router will infer params for you
+export default async function SharePage({
+  params,
+}: {
   params: { token: string };
-}
-
-export default async function SharePage({ params }: SharePageProps) {
-  // 1️⃣ Fetch the token row
+}) {
+  // 1 Fetch and validate token
   const { data } = await supabase
     .from("share_tokens")
     .select("path, used, expires_at")
     .eq("token", params.token)
     .single();
 
-  // 2️⃣ If invalid, viewed or expired, show 404
   if (!data || data.used || new Date(data.expires_at) < new Date()) {
+    // 404 if no valid token
     notFound();
   }
 
-  // 3️⃣ Mark as viewed
+  // mark it as used
   await supabase
     .from("share_tokens")
     .update({ used: true })
     .eq("token", params.token);
 
-  // 4️⃣ Get the public URL
+  // get the public URL
   const { data: urlData } = supabase.storage
     .from("photos")
     .getPublicUrl(data.path);
-
   const publicUrl = urlData.publicUrl;
 
-  // 5️⃣ Render server-side preview + mount client protections
+  // render server-side canvas + client protections
   return (
     <div className="relative flex items-center justify-center min-h-screen bg-black">
       <CanvasPreview src={publicUrl} />

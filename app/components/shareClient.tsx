@@ -1,17 +1,21 @@
+// app/components/ShareClient.tsx
 "use client";
+
 import { useEffect, useRef } from "react";
 
 export default function ShareClient() {
   const timerRef = useRef<number | null>(null);
 
-  // about right-click and certain keys
+  // Block right-click and certain key combos
   useEffect(() => {
     const blockContext = (e: MouseEvent) => e.preventDefault();
     const blockKeys = (e: KeyboardEvent) => {
       if (
         e.key === "PrintScreen" ||
         (e.ctrlKey && ["s", "p", "u"].includes(e.key.toLowerCase()))
-      ) e.preventDefault();
+      ) {
+        e.preventDefault();
+      }
     };
 
     document.addEventListener("contextmenu", blockContext);
@@ -23,20 +27,19 @@ export default function ShareClient() {
     };
   }, []);
 
-  // blur after 5s, expire after 10s
+  // Blur after 5s, expire (reload) after 10s
   useEffect(() => {
-    const blurT = window.setTimeout(() => {
+    const blurTimer = window.setTimeout(() => {
       const canvas = document.querySelector("canvas");
       if (canvas) canvas.classList.add("blur-md");
     }, 5000);
 
     timerRef.current = window.setTimeout(() => {
-      // reload or navigate to expired
       window.location.reload();
     }, 10000);
 
     return () => {
-      clearTimeout(blurT);
+      clearTimeout(blurTimer);
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
